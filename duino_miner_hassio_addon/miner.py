@@ -32,8 +32,14 @@ if len(sys.argv) >= 4:
 else:
     CORES = 2
 
+
 # Safety check: Don't use more cores than available
 CORES = min(CORES, multiprocessing.cpu_count())
+
+if len(sys.argv) >= 5:
+   device_name = sys.argv[4].strip().replace(" ", "_")
+else:
+    device_name = "Hassio-Miner"
 
 
 
