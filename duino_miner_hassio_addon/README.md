@@ -1,3 +1,4 @@
+Multicore Hassio Coin Miner back from decraptation :)
 
 # Duino coin miner Home Assistant addon (deprecated)
 _____
