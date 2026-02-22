@@ -1,7 +1,7 @@
 
 # Duino coin miner Home Assistant addon (deprecated)
 _____
-## Based on [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter)
+## Based on [MineCryptoOnWifiRouter](https://github.com/martinigm/MineCryptoOnWifiRouter)
 
 - Duino single-thread coin miner runs in docker as a HASSIO addon
 - Supported architectures:
