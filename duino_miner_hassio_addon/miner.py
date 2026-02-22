@@ -26,8 +26,8 @@ script_name = sys.argv[0]
 username = sys.argv[1]
 mining_key = sys.argv[2]
 
-# Bruk alle kjerner minus 1 for å spare systemressurser til Hassio
-CORES = max(1, multiprocessing.cpu_count() - 1)
+# Bruk "alle" kjerner minus 2 (halvparten :)) for å spare systemressurser til Hassio
+CORES = max(1, multiprocessing.cpu_count() - 2)
 
 def current_time():
     return time.strftime("%H:%M:%S", time.localtime())
