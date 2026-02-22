@@ -1,16 +1,18 @@
 name: "Duino-Coin Multicore Miner"
 description: "Optimized miner for RPi4"
-version: "1.1.7"
+version: "1.1.8"
 slug: "duco_miner"
 init: false   
 arch:
   - aarch64
   - armv7
 options:
-  username: ""
-  mining_key: ""
+  username: "username"
+  mining_key: "miningkey"
   cores: 2
+  miner_name: "minername"
 schema:
   username: str
   mining_key: str
   cores: int
+  miner_name: str
