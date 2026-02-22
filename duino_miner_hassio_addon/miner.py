@@ -15,15 +15,24 @@ except ImportError:
     import json
     HAS_REQUESTS = False
 
-# --- CONFIGURATION ---
-# Set the number of cores to use. RPi4 has 4 cores, using 2 is safer for Hassio.
-CORES = 2
-
-# Argument handling: expects <username> <mining_key>
 if len(sys.argv) < 3:
-    print("Error: Missing arguments.")
-    print("Usage: python3 script.py <username> <mining_key>")
+    print("Error: Username and Mining Key are required!")
     sys.exit(1)
+
+username = sys.argv[1]
+mining_key = sys.argv[2]
+
+# Check if cores are provided, otherwise default to 2
+if len(sys.argv) >= 4:
+    try:
+        CORES = int(sys.argv[3])
+    except ValueError:
+        CORES = 2
+else:
+    CORES = 2
+
+# Safety check: Don't use more cores than available
+CORES = min(CORES, multiprocessing.cpu_count())
 
 username = sys.argv[1]
 mining_key = sys.argv[2]
