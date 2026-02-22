@@ -1,12 +1,11 @@
-#!/usr/bin/env bash
-set -e
+#!/usr/bin/with-contenv bashio
 
-# Fetching options from Home Assistant config
+# Hent variabler fra menyen
 USER=$(bashio::config 'username')
 KEY=$(bashio::config 'mining_key')
 CORES=$(bashio::config 'cores')
 
-echo "Starting Duino-Coin miner for $USER with $CORES threads..."
+echo "Starting miner for $USER on $CORES cores..."
 
-# This line sends the arguments to miner.py
+# Start python-skriptet
 python3 /app/miner.py "$USER" "$KEY" "$CORES"
