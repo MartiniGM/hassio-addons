@@ -1,14 +1,12 @@
-#!/usr/bin/with-contenv bashio
- 
-echo "Hassio Duco-Miner."
-echo "Based on MineCryptoOnWifiRouter by BastelPichi  "
-echo ""
+#!/usr/bin/env bash
+set -e
 
-USERNAME=$(bashio::config 'username')
-MINING_KEY=$(bashio::config 'mining_key')
+# Fetching options from Home Assistant config
+USER=$(bashio::config 'username')
+KEY=$(bashio::config 'mining_key')
+CORES=$(bashio::config 'cores')
 
-echo "Username is: " $USERNAME
-echo "Mining key is: " $MINING_KEY
+echo "Starting Duino-Coin miner for $USER with $CORES threads..."
 
-echo "Run Miner.py . . ."
-python3 miner.py $USERNAME $MINING_KEY
+# This line sends the arguments to miner.py
+python3 /app/miner.py "$USER" "$KEY" "$CORES"
