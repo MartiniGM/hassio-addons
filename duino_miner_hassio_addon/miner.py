@@ -21,6 +21,7 @@ if len(sys.argv) < 3:
 
 username = sys.argv[1]
 mining_key = sys.argv[2]
+device_name = sys.argv[4]
 
 # Check if cores are provided, otherwise default to 2
 if len(sys.argv) >= 4:
@@ -34,9 +35,7 @@ else:
 # Safety check: Don't use more cores than available
 CORES = min(CORES, multiprocessing.cpu_count())
 
-username = sys.argv[1]
-mining_key = sys.argv[2]
-device_name = "Hassio-RPi4"
+
 
 def current_time():
     """Returns formatted local time."""
