@@ -1,17 +1,14 @@
 name: "Duino-Coin Multicore Miner"
-description: "A multicore SHA-1 miner for Duino-Coin optimized for Raspberry Pi 4."
-version: "1.1.5"
-slug: "duco_multicore_miner"
-init: true
+description: "Optimized miner for RPi4"
+version: "1.1.6"
+slug: "duco_miner"
+init: false   
 arch:
   - aarch64
   - armv7
-  - amd64
-startup: "application"
-boot: "auto"
 options:
-  username: "your_username"
-  mining_key: "your_key"
+  username: ""
+  mining_key: ""
   cores: 2
 schema:
   username: str
