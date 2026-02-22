@@ -8,4 +8,4 @@ CORES=$(bashio::config 'cores')
 echo "Starting miner for $USER on $CORES cores..."
 
 # Start python-skriptet
-python3 /app/miner.py "$USER" "$KEY" "$CORES"
+python3 miner.py "$USER" "$KEY" "$CORES"
