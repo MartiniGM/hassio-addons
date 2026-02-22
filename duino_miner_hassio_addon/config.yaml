@@ -1,22 +1,18 @@
-
-name: "Multi Duino coin miner"
-description: "Mine DUCO in Home Assistant"
-version: "1.1.6"
-slug: "duco-miner"
-init: false
+name: "Duino-Coin Multicore Miner"
+description: "A multicore SHA-1 miner for Duino-Coin optimized for Raspberry Pi 4."
+version: "1.1.0"
+slug: "duco_multicore_miner"
 arch:
   - aarch64
-  - amd64
   - armv7
-
-apparmor: true
-backup: hot
-tmpfs: true
-stage: deprecated
-
+  - amd64
+startup: "application"
+boot: "auto"
 options:
-  username: "username"
-  mining_key: "None"
+  username: "your_username"
+  mining_key: "your_key"
+  cores: 2
 schema:
   username: str
   mining_key: str
+  cores: int
