@@ -6,7 +6,7 @@ import os
 import sys
 import multiprocessing
 
-# Fallback for biblioteker
+# Library fallback: Use requests if available, otherwise use urllib
 try:
     import requests
     HAS_REQUESTS = True
@@ -15,24 +15,26 @@ except ImportError:
     import json
     HAS_REQUESTS = False
 
-# --- ARGUMENT HÅNDTERING ---
-# Forventer: python3 script.py brukernavn mining_key
+# --- CONFIGURATION ---
+# Set the number of cores to use. RPi4 has 4 cores, using 2 is safer for Hassio.
+CORES = 2
+
+# Argument handling: expects <username> <mining_key>
 if len(sys.argv) < 3:
-    print("Feil: Mangler argumenter.")
-    print("Bruk: python3 script.py <brukernavn> <mining_key>")
+    print("Error: Missing arguments.")
+    print("Usage: python3 script.py <username> <mining_key>")
     sys.exit(1)
 
-script_name = sys.argv[0]
 username = sys.argv[1]
 mining_key = sys.argv[2]
-
-# Bruk "alle" kjerner minus 2 (halvparten :)) for å spare systemressurser til Hassio
-CORES = max(1, multiprocessing.cpu_count() - 2)
+device_name = "Hassio-RPi4"
 
 def current_time():
+    """Returns formatted local time."""
     return time.strftime("%H:%M:%S", time.localtime())
 
 def fetch_pools():
+    """Retrieves the best mining node from the Duino-Coin API."""
     url = "https://server.duinocoin.com/getPool"
     while True:
         try:
@@ -44,29 +46,33 @@ def fetch_pools():
                     data = json.loads(response.read().decode())
                     return data["ip"], data["port"]
         except Exception:
+            # Retry after 15 seconds if pool fetching fails
             time.sleep(15)
 
 def mine_worker(worker_id, user, key):
-    """Hashing-prosess for en enkelt CPU-kjerne"""
+    """Main mining logic for a single CPU core."""
     while True:
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            # Hent pool og koble til
+            # Connect to the selected mining node
             try:
                 node_addr, node_port = fetch_pools()
             except:
                 node_addr, node_port = "server.duinocoin.com", 2813
             
             soc.connect((str(node_addr), int(node_port)))
+            # Server version check (optional)
             server_version = soc.recv(100).decode().strip()
             
             while True:
-                # Be om jobb (bruker "LOW" diff for Hassio/CPU)
+                # Request a JOB from the server
                 soc.send(bytes(f"JOB,{user},LOW,{key}", encoding="utf8"))
                 job_data = soc.recv(1024).decode().rstrip("\n")
                 job = job_data.split(",")
                 
-                if len(job) < 3: continue
+                # Check for malformed job data
+                if len(job) < 3:
+                    continue
                 
                 expected_hash = job[1]
                 difficulty = int(job[2])
@@ -74,7 +80,7 @@ def mine_worker(worker_id, user, key):
                 
                 start_time = time.time()
                 
-                # Selve mining-loopen
+                # Hashing loop: Try numbers until hash matches expected result
                 for result in range(100 * difficulty + 1):
                     temp_hash = base_hash.copy()
                     temp_hash.update(str(result).encode("ascii"))
@@ -85,36 +91,40 @@ def mine_worker(worker_id, user, key):
                         diff = max(end_time - start_time, 0.0001)
                         hashrate = result / diff
 
-                        # Send resultat med unikt worker-navn
-                        soc.send(bytes(f"{result},{hashrate},Hassio-MC-Worker-{worker_id}", encoding="utf8"))
+                        # Send result back to server with unique worker ID
+                        soc.send(bytes(f"{result},{hashrate},{device_name}-Worker-{worker_id}", encoding="utf8"))
                         feedback = soc.recv(1024).decode().rstrip("\n")
                         
                         if feedback == "GOOD":
-                            print(f"{current_time()} [{worker_id}]: Share akseptert | {int(hashrate/1000)} kH/s")
+                            print(f"{current_time()} [Worker {worker_id}]: Accepted | {int(hashrate/1000)} kH/s | Diff: {difficulty}")
                         break 
         except Exception as e:
+            # Wait 5s before reconnecting on network error
             time.sleep(5)
         finally:
             soc.close()
 
 if __name__ == '__main__':
+    # Support for multiprocessing in frozen/Docker environments
     multiprocessing.freeze_support()
     
-    print(f"--- Duino-Coin Multicore Miner ---")
-    print(f"Brukernavn: {username}")
-    print(f"Kjerner:    {CORES}")
-    print(f"----------------------------------")
+    print(f"--- Duino-Coin Multicore Miner (Hassio) ---")
+    print(f"User:      {username}")
+    print(f"Threads:   {CORES}")
+    print(f"Status:    Mining started...")
+    print(f"-------------------------------------------")
 
+    # Start the worker processes
     processes = []
     for i in range(CORES):
-        # Vi sender med username og key til hver prosess
         p = multiprocessing.Process(target=mine_worker, args=(i + 1, username, mining_key))
         p.daemon = True
         p.start()
         processes.append(p)
 
+    # Keep the main thread alive
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\nStopper miner...")
+        print("\nStopping miner...")
