@@ -1,6 +1,6 @@
 name: "Duino-Coin Multicore Miner"
 description: "Optimized miner for RPi4"
-version: "1.0.0"
+version: "1.0.1"
 slug: "mgmulti_duco_miner"
 init: false   
 arch:
