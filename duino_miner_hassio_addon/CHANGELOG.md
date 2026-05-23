@@ -1,3 +1,5 @@
+#1.1.5 
+- Addon is back. 
 # 1.1.4
 - Some changes. Now addon is fully deprecated (26.05.24)
 # 1.1.3
